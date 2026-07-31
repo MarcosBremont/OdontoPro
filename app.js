@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -87,8 +87,8 @@ $("#date").value = new Date().toISOString().slice(0, 10);
 $("#amount").addEventListener("input", updatePreview);
 $("#type").addEventListener("change", updatePreview);
 $("#googleLogin").addEventListener("click", async () => {
-  $("#authMessage").textContent = "Abriendo Google...";
-  try { await signInWithPopup(auth, provider); } catch (error) { console.error(error); $("#authMessage").textContent = error.code === "auth/unauthorized-domain" ? "Este dominio aun no esta autorizado en Firebase." : "No se pudo iniciar sesion. Intentalo de nuevo."; }
+  $("#authMessage").textContent = "Redirigiendo a Google...";
+  try { await signInWithRedirect(auth, provider); } catch (error) { console.error(error); $("#authMessage").textContent = "No se pudo iniciar sesion. Intentalo de nuevo."; }
 });
 $("#logoutButton").addEventListener("click", () => signOut(auth));
 $("#procedureForm").addEventListener("submit", async event => {
@@ -110,6 +110,11 @@ $("#saveSettings").addEventListener("click", async () => {
 });
 
 setPersistence(auth, browserLocalPersistence);
+getRedirectResult(auth).catch(error => {
+  console.error(error);
+  const message = error.code === "auth/unauthorized-domain" ? "Este dominio aun no esta autorizado en Firebase." : "No se pudo completar el inicio de sesion.";
+  $("#authMessage").textContent = message;
+});
 onAuthStateChanged(auth, async user => {
   stopListeners();
   if (!user) { activeUser = null; $("#appShell").hidden = true; $("#authScreen").hidden = false; $("#authMessage").textContent = "Usa tu cuenta profesional para proteger los datos de pacientes."; return; }
