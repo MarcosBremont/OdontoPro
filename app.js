@@ -119,8 +119,8 @@ $("#saveSettings").addEventListener("click", async () => {
 
 onAuthStateChanged(auth, async user => {
   stopListeners();
-  if (!user) { activeUser = null; $("#appShell").hidden = true; $("#authScreen").hidden = false; $("#authMessage").textContent = "Usa tu cuenta profesional para proteger los datos de pacientes."; return; }
-  $("#authScreen").hidden = true; $("#appShell").hidden = false; $("#userName").textContent = user.displayName || user.email;
+  if (!user) { activeUser = null; $("#appShell").hidden = true; $("#appShell").inert = true; $("#appShell").setAttribute("aria-hidden", "true"); $("#authScreen").hidden = false; $("#authMessage").textContent = "Usa tu cuenta profesional para proteger los datos de pacientes."; return; }
+  $("#authScreen").hidden = true; $("#appShell").hidden = false; $("#appShell").inert = false; $("#appShell").setAttribute("aria-hidden", "false"); $("#userName").textContent = user.displayName || user.email;
   status("Cargando datos...");
   try { await loadUserData(user); } catch (error) { console.error(error); status("Error de permisos", "error"); }
 });
