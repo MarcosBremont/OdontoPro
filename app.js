@@ -16,7 +16,7 @@ const $ = (selector) => document.querySelector(selector);
 const STORE = "odontopro-data-v2";
 const defaultState = () => ({ settings: { general: 50, specialist: 60, currency: "DOP" }, records: [], ownerId: null });
 let state;
-try { state = JSON.parse(localStorage.getItem(STORE)) || defaultState(); } catch { state = defaultState(); }
+try { state = JSON.parse(localStorage.getItem(STORE) || localStorage.getItem("odontopro-data-v1")) || defaultState(); } catch { state = defaultState(); }
 state.settings ||= defaultState().settings;
 state.settings.currency ||= "DOP";
 state.records ||= [];
