@@ -34,6 +34,10 @@ const currency = (value) => {
 const saveLocal = () => localStorage.setItem(STORE, JSON.stringify(state));
 const percentageFor = (type) => state.settings[type];
 const status = (message, style = "") => { const el = $("#syncStatus"); el.textContent = message; el.className = `sync-status ${style}`; };
+const createId = () => {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  return `procedure-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+};
 const settingsDoc = () => doc(db, ...settingsRefPath);
 const recordsRef = () => collection(db, ...recordsCollectionPath);
 
@@ -91,7 +95,7 @@ $("#type").addEventListener("change", updatePreview);
 $("#procedureForm").addEventListener("submit", async event => {
   event.preventDefault();
   const amount = Number($("#amount").value), type = $("#type").value, percent = percentageFor(type);
-  const record = { id: crypto.randomUUID(), patient: $("#patient").value.trim(), procedure: $("#procedure").value.trim(), type, amount, percent, professional: amount * percent / 100, clinic: amount * (100 - percent) / 100, date: $("#date").value };
+  const record = { id: createId(), patient: $("#patient").value.trim(), procedure: $("#procedure").value.trim(), type, amount, percent, professional: amount * percent / 100, clinic: amount * (100 - percent) / 100, date: $("#date").value };
   state.records.unshift(record); saveLocal(); render();
   event.target.reset(); $("#date").value = new Date().toISOString().slice(0, 10); updatePreview();
   if (db) try { await addRecordToCloud(record); } catch { status("No se pudo guardar en Firebase", "error"); }
