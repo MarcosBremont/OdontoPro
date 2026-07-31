@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OdontoPro | Control de ingresos</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d6654'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='34' fill='white'%3E%2B%3C/text%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">ODONTOPRO · CONTROL FINANCIERO</p>
+          <h1>Tus ingresos,<br /><em>claros y al día.</em></h1>
+          <p class="intro">Registra cada procedimiento y conoce al instante cuánto corresponde a ti y a la clínica.</p>
+        </div>
+        <div class="header-actions"><span class="sync-status" id="syncStatus">Conectando datos...</span><button class="settings-button" id="openSettings" aria-label="Abrir ajustes">⚙ <span>Ajustes</span></button></div>
+      </header>
+
+      <section class="summary-grid" aria-label="Resumen de ingresos">
+        <article class="summary-card total"><span>Facturado</span><strong id="totalBilled">RD$ 0,00</strong><small>Todos los procedimientos registrados</small></article>
+        <article class="summary-card professional"><span>Para ti</span><strong id="totalProfessional">RD$ 0,00</strong><small id="professionalPercent">Tu participación promedio</small></article>
+        <article class="summary-card clinic"><span>Para la clínica</span><strong id="totalClinic">RD$ 0,00</strong><small>Saldo correspondiente a la clínica</small></article>
+      </section>
+
+      <section class="workspace">
+        <article class="panel form-panel">
+          <div class="section-title"><div><p class="eyebrow">NUEVO REGISTRO</p><h2>Agregar procedimiento</h2></div><span class="plus">+</span></div>
+          <form id="procedureForm">
+            <label>Paciente
+              <input id="patient" type="text" placeholder="Nombre del paciente" required />
+            </label>
+            <div class="form-row">
+              <label>Procedimiento
+                <input id="procedure" type="text" placeholder="Ej. Limpieza dental" required />
+              </label>
+              <label>Tipo
+                <select id="type">
+                  <option value="general">General</option>
+                  <option value="specialist">Especialista</option>
+                </select>
+              </label>
+            </div>
+            <div class="form-row amount-row">
+              <label><span id="amountLabel">Monto cobrado (RD$)</span>
+                <input id="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required />
+              </label>
+              <label>Fecha
+                <input id="date" type="date" required />
+              </label>
+            </div>
+            <div class="split-preview" id="splitPreview">
+              <div><span>Te corresponde</span><strong id="previewProfessional">RD$ 0,00</strong></div>
+              <div><span>Clínica</span><strong id="previewClinic">RD$ 0,00</strong></div>
+            </div>
+            <button class="primary-button" type="submit">Guardar procedimiento <span>→</span></button>
+          </form>
+        </article>
+
+        <article class="panel records-panel">
+          <div class="section-title"><div><p class="eyebrow">HISTORIAL</p><h2>Procedimientos registrados</h2></div><button class="text-button" id="clearAll">Limpiar todo</button></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Paciente / procedimiento</th><th>Tipo</th><th>Facturado</th><th>Para ti</th><th></th></tr></thead>
+              <tbody id="recordsBody"></tbody>
+            </table>
+            <div class="empty-state" id="emptyState"><span>⌁</span><p>Aún no registraste procedimientos.</p><small>Agrega el primero desde el formulario.</small></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <dialog id="settingsDialog">
+      <form class="settings-content" id="settingsForm">
+        <button class="close-button" type="button" id="closeSettings" aria-label="Cerrar">×</button>
+        <p class="eyebrow">CONFIGURACIÓN</p><h2>Porcentajes de reparto</h2>
+        <p class="dialog-intro">Estos valores se aplicarán a los nuevos procedimientos que registres.</p>
+        <label>Procedimiento general — tu porcentaje
+          <div class="percent-input"><input id="generalPercent" type="number" min="0" max="100" step="1" /><span>%</span></div>
+        </label>
+        <label>Procedimiento de especialista — tu porcentaje
+          <div class="percent-input"><input id="specialistPercent" type="number" min="0" max="100" step="1" /><span>%</span></div>
+        </label>
+        <label>Moneda de trabajo
+          <select id="currencySelect">
+            <option value="DOP">Peso dominicano (RD$)</option>
+            <option value="USD">Dólar estadounidense (US$)</option>
+          </select>
+        </label>
+        <p class="note">La clínica recibe automáticamente el porcentaje restante.</p>
+        <button class="primary-button" type="button" id="saveSettings">Guardar ajustes <span>→</span></button>
+      </form>
+    </dialog>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
