@@ -11,14 +11,23 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="app-shell">
+    <section class="auth-screen" id="authScreen">
+      <div class="auth-card">
+        <p class="eyebrow">ODONTOPRO</p>
+        <h1>Tu consulta,<br /><em>bajo control.</em></h1>
+        <p>Inicia sesion o crea tu cuenta con Google para mantener tus ingresos privados y sincronizados.</p>
+        <button class="google-button" id="googleLogin" type="button"><span>G</span> Continuar con Google</button>
+        <small id="authMessage">Usa tu cuenta profesional para proteger los datos de pacientes.</small>
+      </div>
+    </section>
+    <main class="app-shell" id="appShell" hidden>
       <header class="hero">
         <div>
           <p class="eyebrow">ODONTOPRO · CONTROL FINANCIERO</p>
           <h1>Tus ingresos,<br /><em>claros y al día.</em></h1>
           <p class="intro">Registra cada procedimiento y conoce al instante cuánto corresponde a ti y a la clínica.</p>
         </div>
-        <div class="header-actions"><span class="sync-status" id="syncStatus">Conectando datos...</span><button class="settings-button" id="openSettings" aria-label="Abrir ajustes">⚙ <span>Ajustes</span></button></div>
+        <div class="header-actions"><span class="sync-status" id="syncStatus">Conectando datos...</span><span class="user-name" id="userName"></span><button class="settings-button" id="openSettings" aria-label="Abrir ajustes">Ajustes</button><button class="logout-button" id="logoutButton" type="button">Salir</button></div>
       </header>
 
       <section class="summary-grid" aria-label="Resumen de ingresos">
@@ -95,6 +104,9 @@
         <button class="primary-button" type="button" id="saveSettings">Guardar ajustes <span>→</span></button>
       </form>
     </dialog>
+    <style>
+      .auth-screen{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#e7f2ed 0%,#f7f6f1 65%)}.auth-card{width:min(440px,100%);padding:42px;background:#fffefa;border:1px solid #e7e7df;border-radius:16px;box-shadow:0 16px 50px #1d66541a}.auth-card h1{font-size:40px;line-height:1.05;margin:0;font-family:"Playfair Display",serif;letter-spacing:-.04em}.auth-card h1 em{color:#1d6654}.auth-card p:not(.eyebrow){color:#74817d;line-height:1.55;font-size:14px;margin:18px 0 24px}.google-button{width:100%;padding:13px 16px;border:1px solid #d9ddd7;border-radius:7px;background:#fff;color:#1b2926;font:600 14px "DM Sans",sans-serif;cursor:pointer}.google-button:hover{background:#f7f6f1}.google-button span{display:inline-grid;place-items:center;width:20px;height:20px;margin-right:9px;border-radius:50%;background:#4285f4;color:white;font-weight:700}.auth-card small{display:block;margin-top:16px;text-align:center;color:#74817d;font-size:11px;line-height:1.45}.user-name{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#52615d}.logout-button{border:0;background:transparent;color:#74817d;font:600 12px "DM Sans",sans-serif;cursor:pointer}.sync-status{font-size:11px;color:#74817d}.sync-status.connected{color:#1d6654}.sync-status.error{color:#b2513b}@media(max-width:800px){.user-name{display:none}.header-actions{gap:7px}}
+    </style>
     <script type="module" src="app.js"></script>
   </body>
 </html>
