@@ -28,6 +28,7 @@ const provider = new GoogleAuthProvider();
 let activeUser = null;
 let unsubscribeSettings = null;
 let unsubscribeRecords = null;
+const authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch(error => console.error("No se pudo preparar la sesion:", error));
 
 const currency = (value) => {
   const prefix = state.settings.currency === "USD" ? "US$" : "RD$";
@@ -88,7 +89,7 @@ $("#amount").addEventListener("input", updatePreview);
 $("#type").addEventListener("change", updatePreview);
 $("#googleLogin").addEventListener("click", async () => {
   $("#authMessage").textContent = "Redirigiendo a Google...";
-  try { await signInWithRedirect(auth, provider); } catch (error) { console.error(error); $("#authMessage").textContent = "No se pudo iniciar sesion. Intentalo de nuevo."; }
+  try { await authPersistenceReady; await signInWithRedirect(auth, provider); } catch (error) { console.error(error); $("#authMessage").textContent = "No se pudo iniciar sesion. Intentalo de nuevo."; }
 });
 $("#logoutButton").addEventListener("click", () => signOut(auth));
 $("#procedureForm").addEventListener("submit", async event => {
@@ -109,7 +110,6 @@ $("#saveSettings").addEventListener("click", async () => {
   try { await saveSettingsToCloud(); } catch (error) { console.error(error); status("No se pudo guardar", "error"); }
 });
 
-setPersistence(auth, browserLocalPersistence);
 getRedirectResult(auth).catch(error => {
   console.error(error);
   const message = error.code === "auth/unauthorized-domain" ? "Este dominio aun no esta autorizado en Firebase." : "No se pudo completar el inicio de sesion.";
