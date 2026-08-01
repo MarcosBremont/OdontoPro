@@ -74,7 +74,7 @@
           <div class="section-title"><div><p class="eyebrow">HISTORIAL</p><h2>Procedimientos registrados</h2></div><button class="text-button" id="clearAll">Limpiar todo</button></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Paciente / procedimiento</th><th>Tipo</th><th>Facturado</th><th>Para ti</th><th></th></tr></thead>
+              <thead><tr><th>Paciente / procedimiento</th><th>Dra</th><th>Tipo</th><th>Facturado</th><th>Para ti</th><th></th></tr></thead>
               <tbody id="recordsBody"></tbody>
             </table>
             <div class="empty-state" id="emptyState"><span>⌁</span><p>Aún no registraste procedimientos.</p><small>Agrega el primero desde el formulario.</small></div>
@@ -99,6 +99,9 @@
             <option value="DOP">Peso dominicano (RD$)</option>
             <option value="USD">Dólar estadounidense (US$)</option>
           </select>
+        </label>
+        <label>Doctora encargada
+          <input id="doctorName" type="text" placeholder="Ej. Dra Jazmin" maxlength="60" />
         </label>
         <p class="note">La clínica recibe automáticamente el porcentaje restante.</p>
         <button class="primary-button" type="button" id="saveSettings">Guardar ajustes <span>→</span></button>

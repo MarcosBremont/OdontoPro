@@ -14,11 +14,12 @@ const firebaseConfig = {
 
 const $ = (selector) => document.querySelector(selector);
 const STORE = "odontopro-data-v2";
-const defaultState = () => ({ settings: { general: 50, specialist: 60, currency: "DOP" }, records: [], ownerId: null });
+const defaultState = () => ({ settings: { general: 50, specialist: 60, currency: "DOP", doctorName: "Jazmin" }, records: [], ownerId: null });
 let state;
 try { state = JSON.parse(localStorage.getItem(STORE) || localStorage.getItem("odontopro-data-v1")) || defaultState(); } catch { state = defaultState(); }
 state.settings ||= defaultState().settings;
 state.settings.currency ||= "DOP";
+state.settings.doctorName ||= "Jazmin";
 state.records ||= [];
 
 const app = initializeApp(firebaseConfig);
@@ -55,7 +56,8 @@ function render() {
   $("#totalClinic").textContent = currency(totals.clinic);
   $("#amountLabel").textContent = `Monto cobrado (${state.settings.currency === "DOP" ? "RD$" : "US$"})`;
   $("#professionalPercent").textContent = totals.billed ? `${(totals.professional / totals.billed * 100).toFixed(1)}% de participacion promedio` : "Tu participacion en los ingresos";
-  $("#recordsBody").innerHTML = state.records.map(item => `<tr><td>${escapeHTML(item.patient)}<small>${escapeHTML(item.procedure)} - ${formatDate(item.date)}</small></td><td><span class="tag ${item.type}">${item.type === "general" ? "General" : "Especialista"}</span></td><td>${currency(item.amount)}</td><td class="you-money">${currency(item.professional)}<small>${item.percent}%</small></td><td><button class="delete" data-id="${item.id}" aria-label="Eliminar registro">x</button></td></tr>`).join("");
+  const doctorName = escapeHTML((state.settings.doctorName || "Jazmin").trim() || "Jazmin");
+  $("#recordsBody").innerHTML = state.records.map(item => `<tr><td>${escapeHTML(item.patient)}<small>${escapeHTML(item.procedure)} - ${formatDate(item.date)}</small></td><td>${doctorName}</td><td><span class="tag ${item.type}">${item.type === "general" ? "General" : "Especialista"}</span></td><td>${currency(item.amount)}</td><td class="you-money">${currency(item.professional)}<small>${item.percent}%</small></td><td><button class="delete" data-id="${item.id}" aria-label="Eliminar registro">x</button></td></tr>`).join("");
   $("#emptyState").hidden = state.records.length > 0;
   $("#clearAll").hidden = state.records.length === 0;
 }
@@ -108,12 +110,13 @@ $("#procedureForm").addEventListener("submit", async event => {
 });
 $("#recordsBody").addEventListener("click", async event => { const id = event.target.dataset.id; if (!id) return; state.records = state.records.filter(record => record.id !== id); saveLocal(); render(); try { await removeRecordFromCloud(id); } catch (error) { console.error(error); status("No se pudo eliminar", "error"); } });
 $("#clearAll").addEventListener("click", async () => { if (!confirm("Eliminar todos los procedimientos registrados?")) return; const deleted = [...state.records]; state.records = []; saveLocal(); render(); try { await Promise.all(deleted.map(record => removeRecordFromCloud(record.id))); } catch (error) { console.error(error); status("No se pudo eliminar", "error"); } });
-$("#openSettings").addEventListener("click", () => { $("#generalPercent").value = state.settings.general; $("#specialistPercent").value = state.settings.specialist; $("#currencySelect").value = state.settings.currency; $("#settingsDialog").showModal(); });
+$("#openSettings").addEventListener("click", () => { $("#generalPercent").value = state.settings.general; $("#specialistPercent").value = state.settings.specialist; $("#currencySelect").value = state.settings.currency; $("#doctorName").value = state.settings.doctorName || "Jazmin"; $("#settingsDialog").showModal(); });
 $("#closeSettings").addEventListener("click", () => $("#settingsDialog").close());
 $("#saveSettings").addEventListener("click", async () => {
   const general = Number($("#generalPercent").value), specialist = Number($("#specialistPercent").value);
   if (!Number.isFinite(general) || !Number.isFinite(specialist) || general < 0 || general > 100 || specialist < 0 || specialist > 100) return alert("Ingresa porcentajes entre 0 y 100.");
-  state.settings = { general, specialist, currency: $("#currencySelect").value }; saveLocal(); $("#settingsDialog").close(); updatePreview(); render();
+  const doctorName = $("#doctorName").value.trim() || "Jazmin";
+  state.settings = { general, specialist, currency: $("#currencySelect").value, doctorName }; saveLocal(); $("#settingsDialog").close(); updatePreview(); render();
   try { await saveSettingsToCloud(); } catch (error) { console.error(error); status("No se pudo guardar", "error"); }
 });
 
