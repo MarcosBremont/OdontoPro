@@ -14,12 +14,13 @@ const firebaseConfig = {
 
 const $ = (selector) => document.querySelector(selector);
 const STORE = "odontopro-data-v2";
-const defaultState = () => ({ settings: { general: 50, specialist: 60, currency: "DOP", doctorName: "Jazmin" }, records: [], ownerId: null });
+const defaultState = () => ({ settings: { general: 50, specialist: 60, currency: "DOP", professionalName: "Dra Genesis", doctorName: "Dra Jazmin" }, records: [], ownerId: null });
 let state;
 try { state = JSON.parse(localStorage.getItem(STORE) || localStorage.getItem("odontopro-data-v1")) || defaultState(); } catch { state = defaultState(); }
 state.settings ||= defaultState().settings;
 state.settings.currency ||= "DOP";
-state.settings.doctorName ||= "Jazmin";
+state.settings.professionalName ||= "Dra Genesis";
+state.settings.doctorName ||= "Dra Jazmin";
 state.records ||= [];
 
 const app = initializeApp(firebaseConfig);
@@ -51,19 +52,99 @@ function updatePreview() {
 
 function render() {
   const totals = state.records.reduce((sum, item) => ({ billed: sum.billed + item.amount, professional: sum.professional + item.professional, clinic: sum.clinic + item.clinic }), { billed: 0, professional: 0, clinic: 0 });
+  const professionalName = escapeHTML((state.settings.professionalName || "Dra Genesis").trim() || "Dra Genesis");
+  const doctorName = escapeHTML((state.settings.doctorName || "Dra Jazmin").trim() || "Dra Jazmin");
   $("#totalBilled").textContent = currency(totals.billed);
   $("#totalProfessional").textContent = currency(totals.professional);
   $("#totalClinic").textContent = currency(totals.clinic);
   $("#amountLabel").textContent = `Monto cobrado (${state.settings.currency === "DOP" ? "RD$" : "US$"})`;
   $("#professionalPercent").textContent = totals.billed ? `${(totals.professional / totals.billed * 100).toFixed(1)}% de participacion promedio` : "Tu participacion en los ingresos";
-  const doctorName = escapeHTML((state.settings.doctorName || "Jazmin").trim() || "Jazmin");
-  $("#recordsBody").innerHTML = state.records.map(item => `<tr><td>${escapeHTML(item.patient)}<small>${escapeHTML(item.procedure)} - ${formatDate(item.date)}</small></td><td>${doctorName}</td><td><span class="tag ${item.type}">${item.type === "general" ? "General" : "Especialista"}</span></td><td>${currency(item.amount)}</td><td class="you-money">${currency(item.professional)}<small>${item.percent}%</small></td><td><button class="delete" data-id="${item.id}" aria-label="Eliminar registro">x</button></td></tr>`).join("");
+  $("#thProfessionalAmount").textContent = professionalName;
+  $("#thClinicAmount").textContent = doctorName;
+  $("#recordsBody").innerHTML = state.records.map(item => `<tr><td>${escapeHTML(item.patient)}<small>${escapeHTML(item.procedure)}</small></td><td>${currency(item.amount)}</td><td>${item.percent}%</td><td class="you-money">${currency(item.professional)}</td><td>${100 - item.percent}%</td><td>${currency(item.clinic)}</td><td>${formatShortDate(item.date)}</td><td><button class="delete" data-id="${item.id}" aria-label="Eliminar registro">x</button></td></tr>`).join("");
   $("#emptyState").hidden = state.records.length > 0;
   $("#clearAll").hidden = state.records.length === 0;
 }
 
 function escapeHTML(text) { const el = document.createElement("div"); el.textContent = text; return el.innerHTML; }
 function formatDate(date) { return new Intl.DateTimeFormat("es-DO", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(`${date}T12:00:00`)); }
+function formatShortDate(date) {
+  const value = new Date(`${date}T12:00:00`);
+  const day = String(value.getDate()).padStart(2, "0");
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const year = String(value.getFullYear()).slice(-2);
+  return `${day}-${month}-${year}`;
+}
+
+function exportRecordsToExcel() {
+  const XLSXLib = globalThis.XLSX;
+  if (!XLSXLib) {
+    alert("No se pudo cargar el exportador de Excel. Intentalo de nuevo.");
+    return;
+  }
+
+  const professionalName = (state.settings.professionalName || "Dra Genesis").trim() || "Dra Genesis";
+  const doctorName = (state.settings.doctorName || "Dra Jazmin").trim() || "Dra Jazmin";
+  const monthYear = new Intl.DateTimeFormat("es-DO", { month: "long", year: "numeric" }).format(new Date());
+
+  const rows = [
+    [`${monthYear.toUpperCase()} PROCEDIMIENTOS`],
+    [],
+    ["PROCEDIMIENTOS", "$", "%", professionalName, "%", doctorName, "Date"]
+  ];
+
+  let totalAmount = 0;
+  let totalProfessional = 0;
+  let totalClinic = 0;
+
+  state.records.forEach(item => {
+    totalAmount += item.amount;
+    totalProfessional += item.professional;
+    totalClinic += item.clinic;
+    rows.push([
+      `${item.patient} - ${item.procedure}`,
+      Number(item.amount.toFixed(2)),
+      `${item.percent}%`,
+      Number(item.professional.toFixed(2)),
+      `${100 - item.percent}%`,
+      Number(item.clinic.toFixed(2)),
+      formatShortDate(item.date)
+    ]);
+  });
+
+  rows.push([]);
+  rows.push(["TOTAL", Number(totalAmount.toFixed(2)), "", Number(totalProfessional.toFixed(2)), "", Number(totalClinic.toFixed(2)), ""]);
+
+  const workbook = XLSXLib.utils.book_new();
+  const worksheet = XLSXLib.utils.aoa_to_sheet(rows);
+  worksheet["!cols"] = [
+    { wch: 38 },
+    { wch: 12 },
+    { wch: 7 },
+    { wch: 16 },
+    { wch: 7 },
+    { wch: 16 },
+    { wch: 12 }
+  ];
+
+  const currencyColumns = ["B", "D", "F"];
+  for (let r = 4; r <= state.records.length + 4; r += 1) {
+    currencyColumns.forEach(col => {
+      const cell = worksheet[`${col}${r}`];
+      if (cell) cell.z = "#,##0.00";
+    });
+  }
+
+  const totalRow = state.records.length + 6;
+  currencyColumns.forEach(col => {
+    const cell = worksheet[`${col}${totalRow}`];
+    if (cell) cell.z = "#,##0.00";
+  });
+
+  XLSXLib.utils.book_append_sheet(workbook, worksheet, "Procedimientos");
+  const dateStamp = new Date().toISOString().slice(0, 10);
+  XLSXLib.writeFile(workbook, `procedimientos-${dateStamp}.xlsx`);
+}
 async function saveSettingsToCloud() { await setDoc(settingsDoc(), { ...state.settings, updatedAt: Date.now() }, { merge: true }); }
 async function addRecordToCloud(record) { await setDoc(doc(recordsRef(), record.id), record); }
 async function removeRecordFromCloud(id) { await deleteDoc(doc(recordsRef(), id)); }
@@ -110,13 +191,22 @@ $("#procedureForm").addEventListener("submit", async event => {
 });
 $("#recordsBody").addEventListener("click", async event => { const id = event.target.dataset.id; if (!id) return; state.records = state.records.filter(record => record.id !== id); saveLocal(); render(); try { await removeRecordFromCloud(id); } catch (error) { console.error(error); status("No se pudo eliminar", "error"); } });
 $("#clearAll").addEventListener("click", async () => { if (!confirm("Eliminar todos los procedimientos registrados?")) return; const deleted = [...state.records]; state.records = []; saveLocal(); render(); try { await Promise.all(deleted.map(record => removeRecordFromCloud(record.id))); } catch (error) { console.error(error); status("No se pudo eliminar", "error"); } });
-$("#openSettings").addEventListener("click", () => { $("#generalPercent").value = state.settings.general; $("#specialistPercent").value = state.settings.specialist; $("#currencySelect").value = state.settings.currency; $("#doctorName").value = state.settings.doctorName || "Jazmin"; $("#settingsDialog").showModal(); });
+$("#exportExcel").addEventListener("click", exportRecordsToExcel);
+$("#openSettings").addEventListener("click", () => {
+  $("#generalPercent").value = state.settings.general;
+  $("#specialistPercent").value = state.settings.specialist;
+  $("#currencySelect").value = state.settings.currency;
+  $("#professionalName").value = state.settings.professionalName || "Dra Genesis";
+  $("#doctorName").value = state.settings.doctorName || "Dra Jazmin";
+  $("#settingsDialog").showModal();
+});
 $("#closeSettings").addEventListener("click", () => $("#settingsDialog").close());
 $("#saveSettings").addEventListener("click", async () => {
   const general = Number($("#generalPercent").value), specialist = Number($("#specialistPercent").value);
   if (!Number.isFinite(general) || !Number.isFinite(specialist) || general < 0 || general > 100 || specialist < 0 || specialist > 100) return alert("Ingresa porcentajes entre 0 y 100.");
-  const doctorName = $("#doctorName").value.trim() || "Jazmin";
-  state.settings = { general, specialist, currency: $("#currencySelect").value, doctorName }; saveLocal(); $("#settingsDialog").close(); updatePreview(); render();
+  const professionalName = $("#professionalName").value.trim() || "Dra Genesis";
+  const doctorName = $("#doctorName").value.trim() || "Dra Jazmin";
+  state.settings = { general, specialist, currency: $("#currencySelect").value, professionalName, doctorName }; saveLocal(); $("#settingsDialog").close(); updatePreview(); render();
   try { await saveSettingsToCloud(); } catch (error) { console.error(error); status("No se pudo guardar", "error"); }
 });
 
