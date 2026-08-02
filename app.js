@@ -60,8 +60,34 @@ function render() {
   $("#amountLabel").textContent = `Monto cobrado (${state.settings.currency === "DOP" ? "RD$" : "US$"})`;
   $("#professionalPercent").textContent = totals.billed ? `${(totals.professional / totals.billed * 100).toFixed(1)}% de participacion promedio` : "Tu participacion en los ingresos";
   $("#thProfessionalAmount").textContent = professionalName;
-  $("#thClinicAmount").textContent = doctorName;
-  $("#recordsBody").innerHTML = state.records.map(item => `<tr><td>${escapeHTML(item.patient)}<small>${escapeHTML(item.procedure)}</small></td><td>${currency(item.amount)}</td><td>${item.percent}%</td><td class="you-money">${currency(item.professional)}</td><td>${100 - item.percent}%</td><td>${currency(item.clinic)}</td><td>${formatShortDate(item.date)}</td><td><button class="delete" data-id="${item.id}" aria-label="Eliminar registro">x</button></td></tr>`).join("");
+
+  // Group records by month
+  const grouped = state.records.sort((a, b) => b.date.localeCompare(a.date)).reduce((acc, item) => {
+    const month = item.date.slice(0, 7); // YYYY-MM
+    acc[month] = acc[month] || [];
+    acc[month].push(item);
+    return acc;
+  }, {});
+
+  const html = Object.entries(grouped).map(([month, items]) => {
+    const monthLabel = new Intl.DateTimeFormat("es-DO", { month: "long", year: "numeric" }).format(new Date(`${month}-02T12:00:00`));
+    const rows = items.map(item => `
+      <tr>
+        <td>${escapeHTML(item.patient)}<small>${escapeHTML(item.procedure)}</small></td>
+        <td><span class="tag ${item.type}">${item.type === "general" ? "General" : "Especialista"}</span></td>
+        <td>${currency(item.amount)}</td>
+        <td>${item.percent}%</td>
+        <td class="you-money">${currency(item.professional)}</td>
+        <td>${100 - item.percent}%</td>
+        <td>${currency(item.clinic)}</td>
+        <td>${formatShortDate(item.date)}</td>
+        <td><button class="delete" data-id="${item.id}" aria-label="Eliminar registro">x</button></td>
+      </tr>
+    `).join("");
+    return `<tr class="month-header"><td colspan="9">${monthLabel.toUpperCase()}</td></tr>${rows}`;
+  }).join("");
+
+  $("#recordsBody").innerHTML = html;
   $("#emptyState").hidden = state.records.length > 0;
   $("#clearAll").hidden = state.records.length === 0;
 }
@@ -79,7 +105,7 @@ function formatShortDate(date) {
 function exportRecordsToExcel() {
   const XLSXLib = globalThis.XLSX;
   if (!XLSXLib) {
-    alert("No se pudo cargar el exportador de Excel. Intentalo de nuevo.");
+    alert("No se pudo cargar el exportador de Excel. Recarga la pagina e intentalo otra vez.");
     return;
   }
 
@@ -90,7 +116,7 @@ function exportRecordsToExcel() {
   const rows = [
     [`${monthYear.toUpperCase()} PROCEDIMIENTOS`],
     [],
-    ["PROCEDIMIENTOS", "$", "%", professionalName, "%", doctorName, "Date"]
+    ["PROCEDIMIENTOS", "TIPO", "$", "%", professionalName, "%", doctorName, "Date"]
   ];
 
   let totalAmount = 0;
@@ -103,6 +129,7 @@ function exportRecordsToExcel() {
     totalClinic += item.clinic;
     rows.push([
       `${item.patient} - ${item.procedure}`,
+      item.type === "general" ? "General" : "Especialista",
       Number(item.amount.toFixed(2)),
       `${item.percent}%`,
       Number(item.professional.toFixed(2)),
@@ -113,12 +140,13 @@ function exportRecordsToExcel() {
   });
 
   rows.push([]);
-  rows.push(["TOTAL", Number(totalAmount.toFixed(2)), "", Number(totalProfessional.toFixed(2)), "", Number(totalClinic.toFixed(2)), ""]);
+  rows.push(["TOTAL", "", Number(totalAmount.toFixed(2)), "", Number(totalProfessional.toFixed(2)), "", Number(totalClinic.toFixed(2)), ""]);
 
   const workbook = XLSXLib.utils.book_new();
   const worksheet = XLSXLib.utils.aoa_to_sheet(rows);
   worksheet["!cols"] = [
     { wch: 38 },
+    { wch: 14 },
     { wch: 12 },
     { wch: 7 },
     { wch: 16 },
@@ -127,7 +155,7 @@ function exportRecordsToExcel() {
     { wch: 12 }
   ];
 
-  const currencyColumns = ["B", "D", "F"];
+  const currencyColumns = ["C", "E", "G"];
   for (let r = 4; r <= state.records.length + 4; r += 1) {
     currencyColumns.forEach(col => {
       const cell = worksheet[`${col}${r}`];
