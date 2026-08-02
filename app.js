@@ -79,6 +79,7 @@ function render() {
     <tr>
       <td>${escapeHTML(item.patient)}<small>${escapeHTML(item.procedure)}</small></td>
       <td><span class="tag ${item.type}">${item.type === "general" ? "General" : "Especialista"}</span></td>
+      <td class="notes-cell">${escapeHTML(item.notes || "")}</td>
       <td>${currency(item.amount)}</td>
       <td>${item.percent}%</td>
       <td class="you-money">${currency(item.professional)}</td>
@@ -122,7 +123,7 @@ function exportRecordsToExcel() {
   const rows = [
     [`${monthLabel.toUpperCase()} PROCEDIMIENTOS`],
     [],
-    ["PROCEDIMIENTOS", "TIPO", "$", "%", professionalName, "%", doctorName, "Date"]
+    ["PROCEDIMIENTOS", "TIPO", "NOTAS", "$", "%", professionalName, "%", doctorName, "Date"]
   ];
 
   let totalAmount = 0;
@@ -136,6 +137,7 @@ function exportRecordsToExcel() {
     rows.push([
       `${item.patient} - ${item.procedure}`,
       item.type === "general" ? "General" : "Especialista",
+      item.notes || "",
       Number(item.amount.toFixed(2)),
       `${item.percent}%`,
       Number(item.professional.toFixed(2)),
@@ -146,13 +148,14 @@ function exportRecordsToExcel() {
   });
 
   rows.push([]);
-  rows.push(["TOTAL", "", Number(totalAmount.toFixed(2)), "", Number(totalProfessional.toFixed(2)), "", Number(totalClinic.toFixed(2)), ""]);
+  rows.push(["TOTAL", "", "", Number(totalAmount.toFixed(2)), "", Number(totalProfessional.toFixed(2)), "", Number(totalClinic.toFixed(2)), ""]);
 
   const workbook = XLSXLib.utils.book_new();
   const worksheet = XLSXLib.utils.aoa_to_sheet(rows);
   worksheet["!cols"] = [
     { wch: 38 },
     { wch: 14 },
+    { wch: 25 },
     { wch: 12 },
     { wch: 7 },
     { wch: 16 },
@@ -161,7 +164,7 @@ function exportRecordsToExcel() {
     { wch: 12 }
   ];
 
-  const currencyColumns = ["C", "E", "G"];
+  const currencyColumns = ["D", "F", "H"];
   for (let r = 4; r <= state.records.length + 4; r += 1) {
     currencyColumns.forEach(col => {
       const cell = worksheet[`${col}${r}`];
@@ -219,7 +222,7 @@ $("#logoutButton").addEventListener("click", () => signOut(auth));
 $("#procedureForm").addEventListener("submit", async event => {
   event.preventDefault();
   const amount = Number($("#amount").value), type = $("#type").value, percent = percentageFor(type);
-  const record = { id: createId(), patient: $("#patient").value.trim(), procedure: $("#procedure").value.trim(), type, amount, percent, professional: amount * percent / 100, clinic: amount * (100 - percent) / 100, date: $("#date").value };
+  const record = { id: createId(), patient: $("#patient").value.trim(), procedure: $("#procedure").value.trim(), type, amount, percent, professional: amount * percent / 100, clinic: amount * (100 - percent) / 100, date: $("#date").value, notes: $("#notes").value.trim() };
   state.records.unshift(record); saveLocal(); render(); event.target.reset(); $("#date").value = new Date().toISOString().slice(0, 10); updatePreview();
   try { await addRecordToCloud(record); } catch (error) { console.error(error); status("No se pudo guardar", "error"); }
 });
