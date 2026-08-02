@@ -13,6 +13,7 @@ const firebaseConfig = {
 };
 
 const $ = (selector) => document.querySelector(selector);
+let currentFilterMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
 const STORE = "odontopro-data-v2";
 const defaultState = () => ({ settings: { general: 50, specialist: 60, currency: "DOP", professionalName: "Dra Genesis", doctorName: "Dra Jazmin" }, records: [], ownerId: null });
 let state;
@@ -51,9 +52,22 @@ function updatePreview() {
 }
 
 function render() {
-  const totals = state.records.reduce((sum, item) => ({ billed: sum.billed + item.amount, professional: sum.professional + item.professional, clinic: sum.clinic + item.clinic }), { billed: 0, professional: 0, clinic: 0 });
+  const allMonths = [...new Set(state.records.map(r => r.date.slice(0, 7)))].sort((a, b) => b.localeCompare(a));
+  if (allMonths.length > 0 && !allMonths.includes(currentFilterMonth)) {
+    currentFilterMonth = allMonths[0];
+  }
+
+  const filterSelect = $("#monthFilter");
+  filterSelect.innerHTML = allMonths.map(m => {
+    const label = new Intl.DateTimeFormat("es-DO", { month: "long", year: "numeric" }).format(new Date(`${m}-02T12:00:00`));
+    return `<option value="${m}" ${m === currentFilterMonth ? "selected" : ""}>${label.toUpperCase()}</option>`;
+  }).join("");
+
+  const filteredRecords = state.records.filter(r => r.date.slice(0, 7) === currentFilterMonth).sort((a, b) => b.date.localeCompare(a.date));
+
+  const totals = filteredRecords.reduce((sum, item) => ({ billed: sum.billed + item.amount, professional: sum.professional + item.professional, clinic: sum.clinic + item.clinic }), { billed: 0, professional: 0, clinic: 0 });
   const professionalName = escapeHTML((state.settings.professionalName || "Dra Genesis").trim() || "Dra Genesis");
-  const doctorName = escapeHTML((state.settings.doctorName || "Dra Jazmin").trim() || "Dra Jazmin");
+  
   $("#totalBilled").textContent = currency(totals.billed);
   $("#totalProfessional").textContent = currency(totals.professional);
   $("#totalClinic").textContent = currency(totals.clinic);
@@ -61,35 +75,24 @@ function render() {
   $("#professionalPercent").textContent = totals.billed ? `${(totals.professional / totals.billed * 100).toFixed(1)}% de participacion promedio` : "Tu participacion en los ingresos";
   $("#thProfessionalAmount").textContent = professionalName;
 
-  // Group records by month
-  const grouped = state.records.sort((a, b) => b.date.localeCompare(a.date)).reduce((acc, item) => {
-    const month = item.date.slice(0, 7); // YYYY-MM
-    acc[month] = acc[month] || [];
-    acc[month].push(item);
-    return acc;
-  }, {});
-
-  const html = Object.entries(grouped).map(([month, items]) => {
-    const monthLabel = new Intl.DateTimeFormat("es-DO", { month: "long", year: "numeric" }).format(new Date(`${month}-02T12:00:00`));
-    const rows = items.map(item => `
-      <tr>
-        <td>${escapeHTML(item.patient)}<small>${escapeHTML(item.procedure)}</small></td>
-        <td><span class="tag ${item.type}">${item.type === "general" ? "General" : "Especialista"}</span></td>
-        <td>${currency(item.amount)}</td>
-        <td>${item.percent}%</td>
-        <td class="you-money">${currency(item.professional)}</td>
-        <td>${100 - item.percent}%</td>
-        <td>${currency(item.clinic)}</td>
-        <td>${formatShortDate(item.date)}</td>
-        <td><button class="delete" data-id="${item.id}" aria-label="Eliminar registro">x</button></td>
-      </tr>
-    `).join("");
-    return `<tr class="month-header"><td colspan="9">${monthLabel.toUpperCase()}</td></tr>${rows}`;
-  }).join("");
+  const html = filteredRecords.map(item => `
+    <tr>
+      <td>${escapeHTML(item.patient)}<small>${escapeHTML(item.procedure)}</small></td>
+      <td><span class="tag ${item.type}">${item.type === "general" ? "General" : "Especialista"}</span></td>
+      <td>${currency(item.amount)}</td>
+      <td>${item.percent}%</td>
+      <td class="you-money">${currency(item.professional)}</td>
+      <td>${100 - item.percent}%</td>
+      <td>${currency(item.clinic)}</td>
+      <td>${formatShortDate(item.date)}</td>
+      <td><button class="delete" data-id="${item.id}" aria-label="Eliminar registro">x</button></td>
+    </tr>
+  `).join("");
 
   $("#recordsBody").innerHTML = html;
-  $("#emptyState").hidden = state.records.length > 0;
+  $("#emptyState").hidden = filteredRecords.length > 0;
   $("#clearAll").hidden = state.records.length === 0;
+  $("#monthFilter").hidden = allMonths.length === 0;
 }
 
 function escapeHTML(text) { const el = document.createElement("div"); el.textContent = text; return el.innerHTML; }
@@ -109,12 +112,15 @@ function exportRecordsToExcel() {
     return;
   }
 
+  const filteredRecords = state.records.filter(r => r.date.slice(0, 7) === currentFilterMonth).sort((a, b) => b.date.localeCompare(a.date));
+  if (filteredRecords.length === 0) return alert("No hay datos para exportar en este mes.");
+
   const professionalName = (state.settings.professionalName || "Dra Genesis").trim() || "Dra Genesis";
   const doctorName = (state.settings.doctorName || "Dra Jazmin").trim() || "Dra Jazmin";
-  const monthYear = new Intl.DateTimeFormat("es-DO", { month: "long", year: "numeric" }).format(new Date());
+  const monthLabel = new Intl.DateTimeFormat("es-DO", { month: "long", year: "numeric" }).format(new Date(`${currentFilterMonth}-02T12:00:00`));
 
   const rows = [
-    [`${monthYear.toUpperCase()} PROCEDIMIENTOS`],
+    [`${monthLabel.toUpperCase()} PROCEDIMIENTOS`],
     [],
     ["PROCEDIMIENTOS", "TIPO", "$", "%", professionalName, "%", doctorName, "Date"]
   ];
@@ -123,7 +129,7 @@ function exportRecordsToExcel() {
   let totalProfessional = 0;
   let totalClinic = 0;
 
-  state.records.forEach(item => {
+  filteredRecords.forEach(item => {
     totalAmount += item.amount;
     totalProfessional += item.professional;
     totalClinic += item.clinic;
@@ -163,15 +169,14 @@ function exportRecordsToExcel() {
     });
   }
 
-  const totalRow = state.records.length + 6;
+  const totalRow = filteredRecords.length + 6;
   currencyColumns.forEach(col => {
     const cell = worksheet[`${col}${totalRow}`];
     if (cell) cell.z = "#,##0.00";
   });
 
   XLSXLib.utils.book_append_sheet(workbook, worksheet, "Procedimientos");
-  const dateStamp = new Date().toISOString().slice(0, 10);
-  XLSXLib.writeFile(workbook, `procedimientos-${dateStamp}.xlsx`);
+  XLSXLib.writeFile(workbook, `procedimientos-${currentFilterMonth}.xlsx`);
 }
 async function saveSettingsToCloud() { await setDoc(settingsDoc(), { ...state.settings, updatedAt: Date.now() }, { merge: true }); }
 async function addRecordToCloud(record) { await setDoc(doc(recordsRef(), record.id), record); }
@@ -196,6 +201,7 @@ async function loadUserData(user) {
 }
 
 $("#date").value = new Date().toISOString().slice(0, 10);
+$("#monthFilter").addEventListener("change", (e) => { currentFilterMonth = e.target.value; render(); });
 $("#amount").addEventListener("input", updatePreview);
 $("#type").addEventListener("change", updatePreview);
 $("#googleLogin").addEventListener("click", async () => {

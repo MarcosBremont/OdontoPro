@@ -71,7 +71,17 @@
         </article>
 
         <article class="panel records-panel">
-          <div class="section-title"><div><p class="eyebrow">HISTORIAL</p><h2>Procedimientos registrados</h2></div><div style="display:flex;gap:8px;align-items:center;"><button class="text-button" id="exportExcel">Imprimir</button><button class="text-button" id="clearAll">Limpiar todo</button></div></div>
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">HISTORIAL</p>
+              <h2>Procedimientos registrados</h2>
+            </div>
+            <div class="records-actions">
+              <select id="monthFilter" class="filter-select"></select>
+              <button class="text-button" id="exportExcel">Imprimir</button>
+              <button class="text-button" id="clearAll">Limpiar todo</button>
+            </div>
+          </div>
           <div class="table-wrap">
             <table>
               <thead>
