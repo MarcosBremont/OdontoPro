@@ -88,8 +88,12 @@ function render() {
       <td>${currency(item.clinic)}</td>
       <td>${formatShortDate(item.date)}</td>
       <td class="row-actions">
-        <button class="edit" data-edit-id="${item.id}" aria-label="Editar registro" title="Editar">Editar</button>
-        <button class="delete" data-id="${item.id}" aria-label="Eliminar registro" title="Eliminar">x</button>
+        <button class="edit" data-edit-id="${item.id}" aria-label="Editar registro" title="Editar">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+        </button>
+        <button class="delete" data-id="${item.id}" aria-label="Eliminar registro" title="Eliminar">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        </button>
       </td>
     </tr>
   `).join("");
@@ -278,9 +282,12 @@ $("#procedureForm").addEventListener("submit", async event => {
   }
 });
 $("#recordsBody").addEventListener("click", async event => {
-  const editId = event.target.dataset.editId;
-  if (editId) { startEditing(editId); return; }
-  const id = event.target.dataset.id; if (!id) return; state.records = state.records.filter(record => record.id !== id); saveLocal(); render(); try { await removeRecordFromCloud(id); } catch (error) { console.error(error); status("No se pudo eliminar", "error"); }
+  const editButton = event.target.closest(".edit");
+  if (editButton) { startEditing(editButton.dataset.editId); return; }
+  const deleteButton = event.target.closest(".delete");
+  if (!deleteButton) return;
+  const id = deleteButton.dataset.id;
+  state.records = state.records.filter(record => record.id !== id); saveLocal(); render(); try { await removeRecordFromCloud(id); } catch (error) { console.error(error); status("No se pudo eliminar", "error"); }
 });
 $("#clearAll").addEventListener("click", async () => { if (!confirm("Eliminar todos los procedimientos registrados?")) return; const deleted = [...state.records]; state.records = []; saveLocal(); render(); try { await Promise.all(deleted.map(record => removeRecordFromCloud(record.id))); } catch (error) { console.error(error); status("No se pudo eliminar", "error"); } });
 $("#exportExcel").addEventListener("click", exportRecordsToExcel);
