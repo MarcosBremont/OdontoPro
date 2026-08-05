@@ -14,6 +14,7 @@ const firebaseConfig = {
 
 const $ = (selector) => document.querySelector(selector);
 let currentFilterMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+let editingId = null;
 const STORE = "odontopro-data-v2";
 const defaultState = () => ({ settings: { general: 50, specialist: 60, currency: "DOP", professionalName: "Dra Genesis", doctorName: "Dra Jazmin" }, records: [], ownerId: null });
 let state;
@@ -86,7 +87,10 @@ function render() {
       <td>${100 - item.percent}%</td>
       <td>${currency(item.clinic)}</td>
       <td>${formatShortDate(item.date)}</td>
-      <td><button class="delete" data-id="${item.id}" aria-label="Eliminar registro">x</button></td>
+      <td class="row-actions">
+        <button class="edit" data-edit-id="${item.id}" aria-label="Editar registro" title="Editar">Editar</button>
+        <button class="delete" data-id="${item.id}" aria-label="Eliminar registro" title="Eliminar">x</button>
+      </td>
     </tr>
   `).join("");
 
@@ -183,6 +187,7 @@ function exportRecordsToExcel() {
 }
 async function saveSettingsToCloud() { await setDoc(settingsDoc(), { ...state.settings, updatedAt: Date.now() }, { merge: true }); }
 async function addRecordToCloud(record) { await setDoc(doc(recordsRef(), record.id), record); }
+async function updateRecordToCloud(record) { await setDoc(doc(recordsRef(), record.id), record); }
 async function removeRecordFromCloud(id) { await deleteDoc(doc(recordsRef(), id)); }
 
 function stopListeners() { unsubscribeSettings?.(); unsubscribeRecords?.(); unsubscribeSettings = null; unsubscribeRecords = null; }
@@ -219,14 +224,64 @@ $("#googleLogin").addEventListener("click", async () => {
   }
 });
 $("#logoutButton").addEventListener("click", () => signOut(auth));
+function startEditing(id) {
+  const record = state.records.find(r => r.id === id);
+  if (!record) return;
+  editingId = id;
+  $("#patient").value = record.patient;
+  $("#procedure").value = record.procedure;
+  $("#type").value = record.type;
+  $("#amount").value = record.amount;
+  $("#date").value = record.date;
+  $("#notes").value = record.notes || "";
+  const submitButton = $("#procedureForm").querySelector(".primary-button");
+  submitButton.innerHTML = "Actualizar procedimiento <span>→</span>";
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.className = "cancel-edit-button";
+  cancelButton.id = "cancelEdit";
+  cancelButton.textContent = "Cancelar edición";
+  const existingCancel = $("#cancelEdit");
+  if (existingCancel) existingCancel.remove();
+  submitButton.insertAdjacentElement("afterend", cancelButton);
+  cancelButton.addEventListener("click", cancelEditing);
+  updatePreview();
+  $("#patient").focus();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function cancelEditing() {
+  editingId = null;
+  $("#procedureForm").reset();
+  $("#date").value = new Date().toISOString().slice(0, 10);
+  const submitButton = $("#procedureForm").querySelector(".primary-button");
+  submitButton.innerHTML = "Guardar procedimiento <span>→</span>";
+  const cancelButton = $("#cancelEdit");
+  if (cancelButton) cancelButton.remove();
+  updatePreview();
+}
+
 $("#procedureForm").addEventListener("submit", async event => {
   event.preventDefault();
   const amount = Number($("#amount").value), type = $("#type").value, percent = percentageFor(type);
-  const record = { id: createId(), patient: $("#patient").value.trim(), procedure: $("#procedure").value.trim(), type, amount, percent, professional: amount * percent / 100, clinic: amount * (100 - percent) / 100, date: $("#date").value, notes: $("#notes").value.trim() };
-  state.records.unshift(record); saveLocal(); render(); event.target.reset(); $("#date").value = new Date().toISOString().slice(0, 10); updatePreview();
-  try { await addRecordToCloud(record); } catch (error) { console.error(error); status("No se pudo guardar", "error"); }
+  const formData = { patient: $("#patient").value.trim(), procedure: $("#procedure").value.trim(), type, amount, percent, professional: amount * percent / 100, clinic: amount * (100 - percent) / 100, date: $("#date").value, notes: $("#notes").value.trim() };
+  if (editingId) {
+    const record = { ...formData, id: editingId };
+    const index = state.records.findIndex(r => r.id === editingId);
+    if (index !== -1) state.records[index] = record;
+    saveLocal(); render(); cancelEditing();
+    try { await updateRecordToCloud(record); status("Procedimiento actualizado", "connected"); } catch (error) { console.error(error); status("No se pudo actualizar", "error"); }
+  } else {
+    const record = { id: createId(), ...formData };
+    state.records.unshift(record); saveLocal(); render(); event.target.reset(); $("#date").value = new Date().toISOString().slice(0, 10); updatePreview();
+    try { await addRecordToCloud(record); } catch (error) { console.error(error); status("No se pudo guardar", "error"); }
+  }
 });
-$("#recordsBody").addEventListener("click", async event => { const id = event.target.dataset.id; if (!id) return; state.records = state.records.filter(record => record.id !== id); saveLocal(); render(); try { await removeRecordFromCloud(id); } catch (error) { console.error(error); status("No se pudo eliminar", "error"); } });
+$("#recordsBody").addEventListener("click", async event => {
+  const editId = event.target.dataset.editId;
+  if (editId) { startEditing(editId); return; }
+  const id = event.target.dataset.id; if (!id) return; state.records = state.records.filter(record => record.id !== id); saveLocal(); render(); try { await removeRecordFromCloud(id); } catch (error) { console.error(error); status("No se pudo eliminar", "error"); }
+});
 $("#clearAll").addEventListener("click", async () => { if (!confirm("Eliminar todos los procedimientos registrados?")) return; const deleted = [...state.records]; state.records = []; saveLocal(); render(); try { await Promise.all(deleted.map(record => removeRecordFromCloud(record.id))); } catch (error) { console.error(error); status("No se pudo eliminar", "error"); } });
 $("#exportExcel").addEventListener("click", exportRecordsToExcel);
 $("#openSettings").addEventListener("click", () => {
