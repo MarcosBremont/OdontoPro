@@ -1,145 +1,1746 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OdontoPro | Control de ingresos</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d6654'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='34' fill='white'%3E%2B%3C/text%3E%3C/svg%3E" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <section class="auth-screen" id="authScreen">
-      <div class="auth-card">
-        <p class="eyebrow">ODONTOPRO</p>
-        <h1>Tu consulta,<br /><em>bajo control.</em></h1>
-        <p>Inicia sesion o crea tu cuenta con Google para mantener tus ingresos privados y sincronizados.</p>
-        <button class="google-button" id="googleLogin" type="button"><span>G</span> Continuar con Google</button>
-        <small id="authMessage">Usa tu cuenta profesional para proteger los datos de pacientes.</small>
-      </div>
-    </section>
-    <main class="app-shell" id="appShell" hidden aria-hidden="true" inert>
-      <header class="hero">
-        <div>
-          <p class="eyebrow">ODONTOPRO · CONTROL FINANCIERO</p>
-          <h1>Tus ingresos,<br /><em>claros y al día.</em></h1>
-          <p class="intro">Registra cada procedimiento y conoce al instante cuánto corresponde a ti y a la clínica.</p>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Marcos Bremont — Desarrollador de software. Portafolio de proyectos, servicios y contacto." />
+  <title>Marcos Bremont | Portafolio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --px-theme: #91FF00;
+      --px-black: #010101;
+      --px-white: #ffffff;
+      --px-text: #707476;
+      --px-heading: #010101;
+      --px-bg: #ffffff;
+      --px-bg-soft: #f8f9fa;
+      --px-border: #e9ecef;
+      --px-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+      --px-shadow-hover: 0 20px 50px rgba(0, 0, 0, .12);
+      --px-radius: 10px;
+      --container: 1140px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: "Jost", sans-serif;
+      font-weight: 400;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--px-text);
+      background-color: var(--px-bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    *:focus {
+      outline: none !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--px-heading);
+      font-weight: 500;
+      line-height: 1.2;
+      margin: 0 0 .5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container);
+      margin-inline: auto;
+      padding-inline: 1.5rem;
+    }
+
+    /* ===== Buttons ===== */
+    .px-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+      padding: 12px 28px;
+      border-radius: 6px;
+      background-color: var(--px-theme);
+      color: var(--px-black);
+      font-weight: 500;
+      font-size: .95rem;
+      border: none;
+      cursor: pointer;
+      transition: all .35s ease;
+      text-decoration: none;
+    }
+
+    .px-btn:hover {
+      background-color: #7ad400;
+      color: var(--px-black);
+      transform: translateY(-2px);
+    }
+
+    .px-btn.dark {
+      background: var(--px-black);
+      color: var(--px-white);
+    }
+
+    .px-btn.dark:hover {
+      background: #1a1a1a;
+      color: var(--px-white);
+    }
+
+    .px-btn.light {
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .2);
+      color: var(--px-white);
+    }
+
+    .px-btn.light:hover {
+      background: var(--px-white);
+      color: var(--px-black);
+    }
+
+    .px-btn.outline {
+      background: transparent;
+      border: 1px solid var(--px-black);
+      color: var(--px-black);
+    }
+
+    .px-btn.outline:hover {
+      background: var(--px-black);
+      color: var(--px-white);
+    }
+
+    /* ===== Header ===== */
+    .header-top-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 20px 0;
+      transition: all .35s ease;
+      background-color: transparent;
+    }
+
+    .fixed-header .header-top-fixed {
+      background-color: var(--px-white);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, .08);
+      padding: 12px 0;
+    }
+
+    .header-top-fixed .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--px-white);
+      letter-spacing: -.5px;
+      transition: color .35s ease;
+    }
+
+    .header-logo span {
+      color: var(--px-theme);
+    }
+
+    .fixed-header .header-logo {
+      color: var(--px-black);
+    }
+
+    .main-menu {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .main-menu a {
+      font-size: .85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--px-white);
+      position: relative;
+      padding: 6px 0;
+      transition: color .35s ease;
+    }
+
+    .main-menu a::after {
+      content: "";
+      position: absolute;
+      left: auto;
+      right: 0;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      background: var(--px-theme);
+      transition: all .35s ease;
+    }
+
+    .main-menu a:hover::after,
+    .main-menu a.active::after {
+      width: 100%;
+      left: 0;
+      right: auto;
+    }
+
+    .fixed-header .main-menu a {
+      color: var(--px-black);
+    }
+
+    .toggler-menu {
+      display: none;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, .2);
+      border-radius: 5px;
+      width: 44px;
+      height: 40px;
+      position: relative;
+      cursor: pointer;
+      transition: all .35s ease;
+    }
+
+    .fixed-header .toggler-menu {
+      border-color: rgba(0, 0, 0, .2);
+    }
+
+    .toggler-menu span {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 17px;
+      height: 0;
+      box-shadow: 0 0 0 1px currentColor, 0 -7px 0 1px currentColor, 0 7px 0 1px currentColor;
+      color: var(--px-white);
+      transition: color .35s ease;
+    }
+
+    .fixed-header .toggler-menu span {
+      color: var(--px-black);
+    }
+
+    @media (max-width: 991px) {
+      .toggler-menu {
+        display: block;
+      }
+
+      .main-menu {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: var(--px-white);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
+        transform: translateY(-150%);
+        transition: transform .35s ease;
+      }
+
+      .main-menu.menu-open {
+        transform: translateY(0);
+      }
+
+      .main-menu a {
+        color: var(--px-black) !important;
+        padding: 10px 0;
+        width: 100%;
+      }
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      background: var(--px-black);
+      color: var(--px-white);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(145, 255, 0, .15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      bottom: -30%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(145, 255, 0, .08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero .container {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .hero .container {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 2rem;
+      }
+    }
+
+    .hero-text h6 {
+      color: var(--px-theme);
+      font-size: .9rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 1rem;
+    }
+
+    .hero-text h1 {
+      color: var(--px-white);
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .hero-text h1 span {
+      color: var(--px-theme);
+    }
+
+    .hero-text .typed-text {
+      display: inline-block;
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      color: rgba(255, 255, 255, .8);
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+      min-height: 2rem;
+    }
+
+    .hero-text .typed-text::after {
+      content: "|";
+      color: var(--px-theme);
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    .hero-text p {
+      color: rgba(255, 255, 255, .7);
+      font-size: 1.05rem;
+      max-width: 500px;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero-text p {
+        margin-inline: auto;
+      }
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .hero-buttons {
+        justify-content: center;
+      }
+    }
+
+    .hero-social {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero-social {
+        justify-content: center;
+      }
+    }
+
+    .hero-social a {
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, .2);
+      color: var(--px-white);
+      font-size: 1rem;
+      transition: all .35s ease;
+    }
+
+    .hero-social a:hover {
+      background: var(--px-theme);
+      border-color: var(--px-theme);
+      color: var(--px-black);
+      transform: translateY(-3px);
+    }
+
+    .hero-image {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-image .img-wrap {
+      width: clamp(280px, 30vw, 420px);
+      height: clamp(280px, 30vw, 420px);
+      border-radius: 20px;
+      background: transparent;
+      border: 3px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-image .img-wrap i {
+      font-size: clamp(6rem, 15vw, 10rem);
+      color: rgba(145, 255, 0, .5);
+    }
+
+    .hero-image .img-wrap::before {
+      display: none;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, .5);
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      z-index: 2;
+    }
+
+    .hero-scroll i {
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    /* ===== Section ===== */
+    .section {
+      padding: 100px 0;
+      position: relative;
+    }
+
+    @media (max-width: 1200px) {
+      .section { padding: 80px 0; }
+    }
+
+    @media (max-width: 767px) {
+      .section { padding: 60px 0; }
+    }
+
+    .section-heading {
+      margin-bottom: 50px;
+      text-align: center;
+    }
+
+    .section-heading h6 {
+      margin: 0 0 10px;
+      font-size: .9rem;
+      font-weight: 400;
+      color: var(--px-text);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    .section-heading h6::after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 2px;
+      background: var(--px-theme);
+      margin: 10px auto 0;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 500;
+    }
+
+    /* ===== About ===== */
+    .about {
+      background: var(--px-bg);
+    }
+
+    .about .container {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    @media (max-width: 768px) {
+      .about .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .about-image {
+      position: relative;
+    }
+
+    .about-image .img-box {
+      width: 100%;
+      aspect-ratio: 3/4;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(145, 255, 0, .15), rgba(1, 1, 1, .05));
+      border: 1px solid var(--px-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .about-image .img-box i {
+      font-size: 8rem;
+      color: rgba(1, 1, 1, .15);
+    }
+
+    .about-image .exp-badge {
+      position: absolute;
+      bottom: 20px;
+      right: -20px;
+      background: var(--px-theme);
+      color: var(--px-black);
+      padding: 15px 25px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: var(--px-shadow);
+    }
+
+    .about-image .exp-badge h3 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .about-image .exp-badge p {
+      margin: 0;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .about-content h3 {
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .about-content .role {
+      color: var(--px-theme);
+      font-weight: 600;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .about-content p {
+      margin-bottom: 1.5rem;
+    }
+
+    .about-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .about-info li {
+      display: flex;
+      gap: .5rem;
+      font-size: .9rem;
+    }
+
+    .about-info li i {
+      color: var(--px-theme);
+      margin-top: 5px;
+    }
+
+    .about-info li strong {
+      color: var(--px-heading);
+      font-weight: 600;
+    }
+
+    /* ===== Services ===== */
+    .services {
+      background: var(--px-bg-soft);
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 991px) {
+      .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 575px) {
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .service-card {
+      background: var(--px-white);
+      border: 1px solid var(--px-border);
+      border-radius: var(--px-radius);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      transition: all .35s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--px-theme);
+      transform: scaleX(0);
+      transition: transform .35s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--px-shadow-hover);
+    }
+
+    .service-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .service-icon {
+      width: 65px;
+      height: 65px;
+      margin: 0 auto 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(145, 255, 0, .12);
+      color: var(--px-theme);
+      font-size: 1.5rem;
+      transition: all .35s ease;
+    }
+
+    .service-card:hover .service-icon {
+      background: var(--px-theme);
+      color: var(--px-black);
+    }
+
+    .service-card h4 {
+      font-size: 1.15rem;
+      margin-bottom: .6rem;
+    }
+
+    .service-card p {
+      font-size: .9rem;
+      margin: 0;
+    }
+
+    /* ===== Portfolio ===== */
+    .portfolio {
+      background: var(--px-bg);
+    }
+
+    .portfolio-filter {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 2rem;
+    }
+
+    .filter-btn {
+      padding: 8px 20px;
+      border: 1px solid var(--px-border);
+      background: transparent;
+      border-radius: 30px;
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--px-text);
+      cursor: pointer;
+      transition: all .35s ease;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--px-theme);
+      border-color: var(--px-theme);
+      color: var(--px-black);
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 991px) {
+      .portfolio-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 575px) {
+      .portfolio-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .portfolio-item {
+      border-radius: var(--px-radius);
+      overflow: hidden;
+      position: relative;
+      background: var(--px-white);
+      border: 1px solid var(--px-border);
+      transition: all .35s ease;
+    }
+
+    .portfolio-item:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--px-shadow-hover);
+    }
+
+    .portfolio-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, rgba(145, 255, 0, .1), rgba(1, 1, 1, .05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .portfolio-img i {
+      font-size: 4rem;
+      color: rgba(1, 1, 1, .15);
+      transition: all .35s ease;
+    }
+
+    .portfolio-item:hover .portfolio-img i {
+      color: rgba(145, 255, 0, .4);
+    }
+
+    .portfolio-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(1, 1, 1, .85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      opacity: 0;
+      transition: opacity .35s ease;
+    }
+
+    .portfolio-item:hover .portfolio-overlay {
+      opacity: 1;
+    }
+
+    .portfolio-overlay a {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--px-theme);
+      color: var(--px-black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transform: translateY(20px);
+      transition: transform .35s ease;
+    }
+
+    .portfolio-item:hover .portfolio-overlay a {
+      transform: translateY(0);
+    }
+
+    .portfolio-overlay a:hover {
+      background: var(--px-white);
+    }
+
+    .portfolio-info {
+      padding: 1.2rem 1.5rem;
+    }
+
+    .portfolio-info .badge {
+      display: inline-block;
+      padding: 3px 12px;
+      background: rgba(145, 255, 0, .15);
+      color: #5a8a00;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 600;
+      margin-bottom: .5rem;
+    }
+
+    .portfolio-info h4 {
+      font-size: 1.1rem;
+      margin-bottom: .3rem;
+    }
+
+    .portfolio-info p {
+      font-size: .85rem;
+      margin: 0 0 .5rem;
+    }
+
+    .portfolio-info .version-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      font-size: .75rem;
+      color: var(--px-text);
+    }
+
+    .portfolio-info .version-tag i {
+      color: var(--px-theme);
+    }
+
+    /* ===== Resume ===== */
+    .resume {
+      background: var(--px-bg-soft);
+    }
+
+    .resume .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      .resume .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .resume-col h3 {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .resume-col h3 i {
+      color: var(--px-theme);
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 5px;
+      bottom: 5px;
+      width: 2px;
+      background: var(--px-border);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -2rem;
+      top: 5px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--px-white);
+      border: 3px solid var(--px-theme);
+    }
+
+    .timeline-item .timeline-date {
+      display: inline-block;
+      padding: 3px 12px;
+      background: var(--px-theme);
+      color: var(--px-black);
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 600;
+      margin-bottom: .5rem;
+    }
+
+    .timeline-item h4 {
+      font-size: 1.05rem;
+      margin-bottom: .3rem;
+    }
+
+    .timeline-item .org {
+      color: var(--px-theme);
+      font-size: .85rem;
+      font-weight: 600;
+      margin-bottom: .5rem;
+      display: block;
+    }
+
+    .timeline-item p {
+      font-size: .9rem;
+      margin: 0;
+    }
+
+    /* ===== Skills ===== */
+    .skills-bar {
+      margin-bottom: 1.2rem;
+    }
+
+    .skills-bar .skill-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: .5rem;
+      font-size: .9rem;
+      font-weight: 500;
+      color: var(--px-heading);
+    }
+
+    .skills-bar .skill-info span:last-child {
+      color: var(--px-theme);
+    }
+
+    .skills-bar .progress {
+      height: 6px;
+      background: var(--px-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .skills-bar .progress-bar {
+      height: 100%;
+      background: var(--px-theme);
+      border-radius: 10px;
+      width: 0;
+      transition: width 1.5s ease;
+    }
+
+    /* ===== Contact ===== */
+    .contact {
+      background: var(--px-bg);
+    }
+
+    .contact .container {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      .contact .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .contact-info h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .contact-info p {
+      margin-bottom: 2rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-item .icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(145, 255, 0, .12);
+      color: var(--px-theme);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .contact-item .details h5 {
+      font-size: .85rem;
+      color: var(--px-text);
+      margin-bottom: .2rem;
+      font-weight: 400;
+    }
+
+    .contact-item .details p {
+      margin: 0;
+      color: var(--px-heading);
+      font-weight: 500;
+    }
+
+    .contact-form {
+      background: var(--px-bg-soft);
+      padding: 2rem;
+      border-radius: var(--px-radius);
+      border: 1px solid var(--px-border);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 575px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--px-heading);
+      margin-bottom: .4rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid var(--px-border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: .9rem;
+      color: var(--px-heading);
+      background: var(--px-white);
+      transition: border-color .35s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--px-theme);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* ===== Footer ===== */
+    .footer {
+      background: var(--px-black);
+      padding: 30px 0;
+      border-top: 1px solid rgba(255, 255, 255, .1);
+      color: rgba(255, 255, 255, .7);
+      font-size: .85rem;
+      text-align: center;
+    }
+
+    .footer-social {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-social a {
+      width: 38px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, .15);
+      color: rgba(255, 255, 255, .7);
+      transition: all .35s ease;
+    }
+
+    .footer-social a:hover {
+      background: var(--px-theme);
+      border-color: var(--px-theme);
+      color: var(--px-black);
+    }
+
+    .footer a {
+      color: var(--px-theme);
+    }
+
+    /* ===== Return to top ===== */
+    #return-to-top {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 45px;
+      height: 45px;
+      background: var(--px-theme);
+      color: var(--px-black);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all .35s ease;
+      border: none;
+    }
+
+    #return-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #return-to-top:hover {
+      transform: translateY(-4px);
+    }
+
+    /* ===== Scroll animations ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .8s ease, transform .8s ease;
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+    .reveal-delay-4 { transition-delay: .4s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== Header ===== -->
+  <header class="header-top-fixed" id="header">
+    <div class="container">
+      <a href="#home" class="header-logo">Marcos<span>.</span></a>
+
+      <nav class="main-menu" id="mainMenu">
+        <a href="#home" class="active">Inicio</a>
+        <a href="#about">Sobre mí</a>
+        <a href="#portfolio">Portafolio</a>
+        <a href="#contact">Contacto</a>
+      </nav>
+
+      <button class="toggler-menu" id="toggler" aria-label="Menú">
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero" id="home">
+    <div class="container">
+      <div class="hero-text">
+        <h6>Hola, soy</h6>
+        <h1>Marcos <span>Bremont</span></h1>
+        <div class="typed-text" id="typed"></div>
+        <p>
+          Ingeniero en software especializado en aplicaciones moviles aunque ahora
+          incursionando en el mundo de las PWA, plataformas educativas y algun que otro
+          proyecto web.
+        </p>
+        <div class="hero-buttons">
+          <a href="#portfolio" class="px-btn">
+            Ver proyectos <i class="fa-solid fa-arrow-right"></i>
+          </a>
+          <a href="#contact" class="px-btn light">
+            Contáctame <i class="fa-solid fa-envelope"></i>
+          </a>
         </div>
-        <div class="header-actions"><span class="sync-status" id="syncStatus">Conectando datos...</span><span class="user-name" id="userName"></span><button class="settings-button" id="openSettings" aria-label="Abrir ajustes">Ajustes</button><button class="logout-button" id="logoutButton" type="button">Salir</button></div>
-      </header>
+        <div class="hero-social">
+          <a href="https://github.com/MarcosBremont" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+          <a href="mailto:soymarcosbremont@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+        </div>
+      </div>
 
-      <section class="summary-grid" aria-label="Resumen de ingresos">
-        <article class="summary-card total"><span>Facturado</span><strong id="totalBilled">RD$ 0,00</strong><small>Todos los procedimientos registrados</small></article>
-        <article class="summary-card professional"><span>Para ti</span><strong id="totalProfessional">RD$ 0,00</strong><small id="professionalPercent">Tu participación promedio</small></article>
-        <article class="summary-card clinic"><span>Para la clínica</span><strong id="totalClinic">RD$ 0,00</strong><small>Saldo correspondiente a la clínica</small></article>
-      </section>
+      <div class="hero-image">
+        <div class="img-wrap">
+          <img src="Foto2x2.png" alt="Marcos Bremont" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px; filter: grayscale(100%);" />
+        </div>
+      </div>
+    </div>
 
-      <section class="workspace">
-        <article class="panel form-panel">
-          <div class="section-title"><div><p class="eyebrow">NUEVO REGISTRO</p><h2>Agregar procedimiento</h2></div><span class="plus">+</span></div>
-          <form id="procedureForm">
-            <label>Paciente
-              <input id="patient" type="text" placeholder="Nombre del paciente" required />
-            </label>
-            <div class="form-row">
-              <label>Procedimiento
-                <input id="procedure" type="text" placeholder="Ej. Limpieza dental" required />
-              </label>
-              <label>Tipo
-                <select id="type">
-                  <option value="general">General</option>
-                  <option value="specialist">Especialista</option>
-                </select>
-              </label>
-            </div>
-            <div class="form-row amount-row">
-              <label><span id="amountLabel">Monto cobrado (RD$)</span>
-                <input id="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required />
-              </label>
-              <label>Fecha
-                <input id="date" type="date" required />
-              </label>
-            </div>
-            <label>Notas / Observaciones
-              <input id="notes" type="text" placeholder="Ej. Depósito en cuenta, pendiente, etc." />
-            </label>
-            <div class="split-preview" id="splitPreview">
-              <div><span>Te corresponde</span><strong id="previewProfessional">RD$ 0,00</strong></div>
-              <div><span>Clínica</span><strong id="previewClinic">RD$ 0,00</strong></div>
-            </div>
-            <button class="primary-button" type="submit">Guardar procedimiento <span>→</span></button>
-          </form>
-        </article>
+    <a href="#about" class="hero-scroll">
+      Scroll
+      <i class="fa-solid fa-chevron-down"></i>
+    </a>
+  </section>
 
-        <article class="panel records-panel">
-          <div class="section-title">
-            <div>
-              <p class="eyebrow">HISTORIAL</p>
-              <h2>Procedimientos registrados</h2>
+  <!-- ===== About ===== -->
+  <section class="section about" id="about">
+    <div class="container">
+      <div class="about-image reveal">
+        <div class="img-box">
+          <img src="Foto2x2.png" alt="Marcos Bremont" style="width: 100%; height: 100%; object-fit: cover; border-radius: 19px; filter: grayscale(100%);" />
+        </div>
+        <div class="exp-badge">
+          <h3>5+</h3>
+          <p>Años</p>
+        </div>
+      </div>
+
+      <div class="about-content reveal reveal-delay-1">
+        <span class="role">Desarrollador Full Stack</span>
+        <h3>Diseño y construyo experiencias digitales</h3>
+        <p>
+          Soy un desarrollador apasionado por crear soluciones web modernas y eficientes.
+          Mi enfoque se centra en construir aplicaciones que combinan un diseño limpio
+          con un rendimiento óptimo, utilizando las tecnologías más actuales del ecosistema
+          web.
+        </p>
+        <p>
+          He trabajado en proyectos que van desde plataformas educativas hasta aplicaciones
+          financieras y herramientas de productividad, siempre buscando la mejor experiencia
+          para el usuario final.
+        </p>
+
+        <ul class="about-info">
+          <li><i class="fa-solid fa-circle-check"></i> <span><strong>Nombre:</strong> Marcos Bremont</span></li>
+          <li><i class="fa-solid fa-circle-check"></i> <span><strong>Email:</strong> soymarcosbremont@gmail.com</span></li>
+          <li><i class="fa-solid fa-circle-check"></i> <span><strong>Ubicación:</strong> Republica Dominicana</span></li>
+          <li><i class="fa-solid fa-circle-check"></i> <span><strong>Disponible:</strong> Para proyectos</span></li>
+        </ul>
+
+        <a href="#contact" class="px-btn">Hablemos <i class="fa-solid fa-paper-plane"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Portfolio ===== -->
+  <section class="section portfolio" id="portfolio">
+    <div class="container">
+      <div class="section-heading reveal">
+        <h6>Portafolio</h6>
+        <h2>Proyectos destacados</h2>
+      </div>
+
+      <div class="portfolio-filter reveal">
+        <button class="filter-btn active" data-filter="all">Todos</button>
+        <button class="filter-btn" data-filter="Plataforma">Plataformas</button>
+        <button class="filter-btn" data-filter="Finanzas">Finanzas</button>
+        <button class="filter-btn" data-filter="PWA">PWA</button>
+        <button class="filter-btn" data-filter="Productividad">Productividad</button>
+      </div>
+
+      <div class="portfolio-grid" id="portfolio-grid"></div>
+    </div>
+  </section>
+
+  <!-- ===== Contact ===== -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <div class="contact-info reveal">
+        <h3>Hablemos un rato</h3>
+        <p>
+          Estoy disponible para colaboraciones, no dudes en contactarme.
+        </p>
+
+        <div class="contact-item">
+          <div class="icon"><i class="fa-solid fa-envelope"></i></div>
+          <div class="details">
+            <h5>Email</h5>
+            <p>soymarcosbremont@gmail.com</p>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div class="details">
+            <h5>Ubicación</h5>
+            <p>Republica Dominicana</p>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="icon"><i class="fa-solid fa-clock"></i></div>
+          <div class="details">
+            <h5>Disponibilidad</h5>
+            <p>Lun — Vie: 8:00 AM — 10:00 PM</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form reveal reveal-delay-1">
+        <form id="contactForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Nombre</label>
+              <input type="text" id="name" name="name" placeholder="Tu nombre" required />
             </div>
-            <div class="records-actions">
-              <select id="monthFilter" class="filter-select"></select>
-              <button class="text-button" id="exportExcel">Imprimir</button>
-              <button class="text-button" id="clearAll">Limpiar todo</button>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="Tu email" required />
             </div>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Paciente / procedimiento</th>
-                  <th>Tipo</th>
-                  <th>Notas</th>
-                  <th>Facturado</th>
-                  <th>%</th>
-                  <th id="thProfessionalAmount">Dra Genesis</th>
-                  <th>%</th>
-                  <th>Clinica</th>
-                  <th>Fecha</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="recordsBody"></tbody>
-            </table>
-            <div class="empty-state" id="emptyState"><span>⌁</span><p>Aún no registraste procedimientos.</p><small>Agrega el primero desde el formulario.</small></div>
+          <div class="form-group">
+            <label for="subject">Asunto</label>
+            <input type="text" id="subject" name="subject" placeholder="Asunto del mensaje" required />
           </div>
-        </article>
-      </section>
-    </main>
+          <div class="form-group">
+            <label for="message">Mensaje</label>
+            <textarea id="message" name="message" placeholder="Cuéntame sobre tu proyecto..." required></textarea>
+          </div>
+          <button type="submit" class="px-btn">Enviar mensaje <i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+  </section>
 
-    <dialog id="settingsDialog">
-      <form class="settings-content" id="settingsForm">
-        <button class="close-button" type="button" id="closeSettings" aria-label="Cerrar">×</button>
-        <p class="eyebrow">CONFIGURACIÓN</p><h2>Porcentajes de reparto</h2>
-        <p class="dialog-intro">Estos valores se aplicarán a los nuevos procedimientos que registres.</p>
-        <label>Procedimiento general — tu porcentaje
-          <div class="percent-input"><input id="generalPercent" type="number" min="0" max="100" step="1" /><span>%</span></div>
-        </label>
-        <label>Procedimiento de especialista — tu porcentaje
-          <div class="percent-input"><input id="specialistPercent" type="number" min="0" max="100" step="1" /><span>%</span></div>
-        </label>
-        <label>Moneda de trabajo
-          <select id="currencySelect">
-            <option value="DOP">Peso dominicano (RD$)</option>
-            <option value="USD">Dólar estadounidense (US$)</option>
-          </select>
-        </label>
-        <label>Tu nombre (doctora)
-          <input id="professionalName" type="text" placeholder="Ej. Dra Genesis" maxlength="60" />
-        </label>
-        <label>Doctora encargada
-          <input id="doctorName" type="text" placeholder="Ej. Dra Jazmin" maxlength="60" />
-        </label>
-        <p class="note">La clínica recibe automáticamente el porcentaje restante.</p>
-        <button class="primary-button" type="button" id="saveSettings">Guardar ajustes <span>→</span></button>
-      </form>
-    </dialog>
-    <style>
-      [hidden]{display:none !important}.auth-screen{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#e7f2ed 0%,#f7f6f1 65%)}.auth-card{width:min(440px,100%);padding:42px;background:#fffefa;border:1px solid #e7e7df;border-radius:16px;box-shadow:0 16px 50px #1d66541a}.auth-card h1{font-size:40px;line-height:1.05;margin:0;font-family:"Playfair Display",serif;letter-spacing:-.04em}.auth-card h1 em{color:#1d6654}.auth-card p:not(.eyebrow){color:#74817d;line-height:1.55;font-size:14px;margin:18px 0 24px}.google-button{width:100%;padding:13px 16px;border:1px solid #d9ddd7;border-radius:7px;background:#fff;color:#1b2926;font:600 14px "DM Sans",sans-serif;cursor:pointer}.google-button:hover{background:#f7f6f1}.google-button span{display:inline-grid;place-items:center;width:20px;height:20px;margin-right:9px;border-radius:50%;background:#4285f4;color:white;font-weight:700}.auth-card small{display:block;margin-top:16px;text-align:center;color:#74817d;font-size:11px;line-height:1.45}.user-name{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#52615d}.logout-button{border:0;background:transparent;color:#74817d;font:600 12px "DM Sans",sans-serif;cursor:pointer}.sync-status{font-size:11px;color:#74817d}.sync-status.connected{color:#1d6654}.sync-status.error{color:#b2513b}@media(max-width:800px){.user-name{display:none}.header-actions{gap:7px}}
-    </style>
-    <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script type="module" src="app.js"></script>
-  </body>
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-social">
+        <a href="https://github.com/MarcosBremont" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+        <a href="mailto:soymarcosbremont@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+      </div>
+      <p>&copy; <span id="year"></span> Marcos Bremont.</p>
+    </div>
+  </footer>
+
+  <!-- ===== Return to top ===== -->
+  <button id="return-to-top" aria-label="Volver arriba">
+    <i class="fa-solid fa-chevron-up"></i>
+  </button>
+
+  <script>
+    /* ===== Data ===== */
+    const projects = [
+      {
+        id: "tinclass",
+        title: "TinClass",
+        tag: "Plataforma",
+        description: "Plataforma educativa para gestión de clases, estudiantes y contenido académico.",
+        status: "Activo",
+        version: "v15.45",
+        versionEndpoint: "https://tinclass.com/version.json",
+        url: "https://tinclass.com/",
+        cta: "Ver proyecto",
+        icon: "fa-graduation-cap"
+      },
+      {
+        id: "duofinanzas",
+        title: "DuoFinanzas",
+        tag: "Finanzas",
+        description: "Herramienta de gestión financiera con presupuestos, métricas y visualización de datos.",
+        status: "Activo",
+        version: "v1.0.1",
+        versionEndpoint: "https://tinclass.com/DuoFinanzas/version.json",
+        url: "http://tinclass.com/DuoFinanzas/",
+        cta: "Ver proyecto",
+        icon: "fa-chart-line"
+      },
+      {
+        id: "gymbasics",
+        title: "GymBasics PWA",
+        tag: "PWA",
+        description: "App progresiva para gestión de rutinas de entrenamiento y seguimiento de progreso.",
+        status: "Activo",
+        version: "v1.0.1",
+        versionEndpoint: "https://tinclass.com/GymBasicsPwa/version.json",
+        url: "http://tinclass.com/GymBasicsPwa/",
+        cta: "Ver proyecto",
+        icon: "fa-dumbbell"
+      },
+      {
+        id: "habitos",
+        title: "Sistema de Hábitos",
+        tag: "Productividad",
+        description: "Sistema de seguimiento de hábitos con estadísticas, rachas y recordatorios inteligentes.",
+        status: "Activo",
+        version: "v1.0.1",
+        versionEndpoint: "https://tinclass.com/SistemaHabitos/version.json",
+        url: "http://tinclass.com/SistemaHabitos/",
+        cta: "Ver proyecto",
+        icon: "fa-calendar-check"
+      },
+      {
+        id: "apuntafacil",
+        title: "ApuntaFácil",
+        tag: "Productividad",
+        description: "Herramienta de notas y apuntes rápida y sencilla para organizar tus ideas.",
+        status: "Activo",
+        version: "v1.0.0",
+        versionEndpoint: "https://tinclass.com/ApuntaFacil/version.json",
+        url: "http://tinclass.com/ApuntaFacil/",
+        cta: "Ver proyecto",
+        icon: "fa-pen-to-square"
+      },
+       {
+        id: "aladin",
+        title: "Aladin",
+        tag: "Finanzas",
+        description: "Plataforma diseñada para rastrear las cosas que quieres comprar.",
+        status: "Activo",
+        version: "v1.0.0",
+        versionEndpoint: "https://tinclass.com/Aladin/version.json",
+        url: "http://tinclass.com/aladin/",
+        cta: "Ver proyecto",
+        icon: "fa-coins"
+      },
+      {
+        id: "odontopro",
+        title: "OdontoPro",
+        tag: "Gestión de pacientes",
+        description: "Plataforma odontológica para gestión de pacientes y citas.",
+        status: "Activo",
+        version: "v1.0.0",
+        versionEndpoint: "https://tinclass.com/OdontoPro/version.json",
+        url: "http://tinclass.com/OdontoPro/",
+        cta: "Ver proyecto",
+        icon: "fa-tooth"
+      },
+      {
+        id: "vextoerp",
+        title: "VextoERP",
+        tag: "Finanzas",
+        description: "Sistema ERP para la gestión financiera y administrativa de empresas.",
+        status: "Activo",
+        version: "v1.0.0",
+        versionEndpoint: "https://tinclass.com/VextoERP/version.json",
+        url: "http://tinclass.com/VextoERP/",
+        cta: "Ver proyecto",
+        icon: "fa-building-columns"
+      }
+    ];
+
+    /* ===== Render portfolio ===== */
+    const portfolioGrid = document.getElementById("portfolio-grid");
+
+    function renderProjects(items) {
+      portfolioGrid.innerHTML = "";
+
+      const fragment = document.createDocumentFragment();
+
+      items.forEach((project, index) => {
+        const item = document.createElement("div");
+        item.className = "portfolio-item reveal";
+        if (index % 3 === 1) item.classList.add("reveal-delay-1");
+        if (index % 3 === 2) item.classList.add("reveal-delay-2");
+        item.setAttribute("data-tag", project.tag);
+
+        item.innerHTML = `
+          <div class="portfolio-img">
+            <i class="fa-solid ${project.icon}"></i>
+            <div class="portfolio-overlay">
+              <a href="${project.url}" target="_blank" rel="noopener" aria-label="Visitar ${project.title}">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+            </div>
+          </div>
+          <div class="portfolio-info">
+            <span class="badge">${project.tag}</span>
+            <h4>${project.title}</h4>
+            <p>${project.description}</p>
+            <span class="version-tag" id="version-${project.id}">
+              <i class="fa-solid fa-code-branch"></i> ${project.version}
+            </span>
+          </div>
+        `;
+
+        fragment.appendChild(item);
+      });
+
+      portfolioGrid.appendChild(fragment);
+
+      // Re-observe new reveal elements
+      document.querySelectorAll(".portfolio-item.reveal").forEach((el) => revealObserver.observe(el));
+    }
+
+    /* ===== Version sync ===== */
+    async function loadProjectVersion(project) {
+      if (!project.versionEndpoint) return project;
+
+      try {
+        const response = await fetch(project.versionEndpoint, { method: "GET", cache: "no-store" });
+        if (!response.ok) return project;
+
+        const data = await response.json();
+        const remoteVersion = String(data?.version ?? "").trim();
+        if (!remoteVersion) return project;
+
+        project.version = remoteVersion.startsWith("v") ? remoteVersion : `v${remoteVersion}`;
+      } catch (_error) {
+        // Keep local fallback
+      }
+
+      return project;
+    }
+
+    async function syncVersions(items) {
+      await Promise.all(items.map((p) => loadProjectVersion(p)));
+      // Update DOM with fetched versions
+      items.forEach((p) => {
+        const el = document.getElementById(`version-${p.id}`);
+        if (el) el.innerHTML = `<i class="fa-solid fa-code-branch"></i> ${p.version}`;
+      });
+    }
+
+    /* ===== Filter ===== */
+    const filterButtons = document.querySelectorAll(".filter-btn");
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const filter = btn.getAttribute("data-filter");
+        const filtered = filter === "all" ? projects : projects.filter((p) => p.tag === filter);
+        renderProjects(filtered);
+      });
+    });
+
+    /* ===== Header scroll ===== */
+    const header = document.getElementById("header");
+
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 50) {
+        document.body.classList.add("fixed-header");
+      } else {
+        document.body.classList.remove("fixed-header");
+      }
+
+      // Return to top
+      const returnTop = document.getElementById("return-to-top");
+      if (window.scrollY > 400) {
+        returnTop.classList.add("visible");
+      } else {
+        returnTop.classList.remove("visible");
+      }
+
+      // Active nav link
+      const sections = document.querySelectorAll("section[id]");
+      let current = "";
+
+      sections.forEach((section) => {
+        const top = section.offsetTop - 100;
+        if (window.scrollY >= top) {
+          current = section.getAttribute("id");
+        }
+      });
+
+      document.querySelectorAll(".main-menu a").forEach((a) => {
+        a.classList.remove("active");
+        if (a.getAttribute("href") === `#${current}`) {
+          a.classList.add("active");
+        }
+      });
+    });
+
+    /* ===== Mobile menu ===== */
+    const toggler = document.getElementById("toggler");
+    const mainMenu = document.getElementById("mainMenu");
+
+    toggler.addEventListener("click", () => {
+      mainMenu.classList.toggle("menu-open");
+    });
+
+    mainMenu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        mainMenu.classList.remove("menu-open");
+      });
+    });
+
+    /* ===== Return to top ===== */
+    document.getElementById("return-to-top").addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    /* ===== Typed text effect ===== */
+    const typedEl = document.getElementById("typed");
+    const phrases = [
+      "Ingeniero En Software.",
+      "Gymrat.",
+      "Gamer.",
+      "Maestro."
+    ];
+
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+
+    function typeEffect() {
+      const current = phrases[phraseIndex];
+
+      if (isDeleting) {
+        typedEl.textContent = current.substring(0, charIndex - 1);
+        charIndex--;
+      } else {
+        typedEl.textContent = current.substring(0, charIndex + 1);
+        charIndex++;
+      }
+
+      let speed = isDeleting ? 50 : 100;
+
+      if (!isDeleting && charIndex === current.length) {
+        speed = 2000;
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        phraseIndex = (phraseIndex + 1) % phrases.length;
+        speed = 500;
+      }
+
+      setTimeout(typeEffect, speed);
+    }
+
+    typeEffect();
+
+    /* ===== Scroll reveal ===== */
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+
+            // Animate skill bars
+            if (entry.target.classList.contains("resume-col")) {
+              entry.target.querySelectorAll(".progress-bar").forEach((bar) => {
+                bar.style.width = bar.getAttribute("data-width");
+              });
+            }
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+
+    /* ===== Contact form ===== */
+    document.getElementById("contactForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Mensaje enviado!';
+        e.target.reset();
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+        }, 3000);
+      }, 1500);
+    });
+
+    /* ===== Year ===== */
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    /* ===== Init ===== */
+    renderProjects(projects);
+    syncVersions(projects);
+  </script>
+</body>
 </html>
