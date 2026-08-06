@@ -13,7 +13,14 @@ const firebaseConfig = {
 };
 
 const $ = (selector) => document.querySelector(selector);
-let currentFilterMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+const todayLocal = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+let currentFilterMonth = todayLocal().slice(0, 7); // YYYY-MM
 let editingId = null;
 const STORE = "odontopro-data-v2";
 const defaultState = () => ({ settings: { general: 50, specialist: 60, currency: "DOP", professionalName: "Dra Genesis", doctorName: "Dra Jazmin" }, records: [], ownerId: null });
@@ -212,7 +219,7 @@ async function loadUserData(user) {
   unsubscribeRecords = onSnapshot(recordsRef(), snapshot => { if (activeUser?.uid === user.uid) { state.records = snapshot.docs.map(item => item.data()); saveLocal(); render(); } });
 }
 
-$("#date").value = new Date().toISOString().slice(0, 10);
+$("#date").value = todayLocal();
 $("#monthFilter").addEventListener("change", (e) => { currentFilterMonth = e.target.value; render(); });
 $("#amount").addEventListener("input", updatePreview);
 $("#type").addEventListener("change", updatePreview);
@@ -257,7 +264,7 @@ function startEditing(id) {
 function cancelEditing() {
   editingId = null;
   $("#procedureForm").reset();
-  $("#date").value = new Date().toISOString().slice(0, 10);
+  $("#date").value = todayLocal();
   const submitButton = $("#procedureForm").querySelector(".primary-button");
   submitButton.innerHTML = "Guardar procedimiento <span>→</span>";
   const cancelButton = $("#cancelEdit");
@@ -277,7 +284,7 @@ $("#procedureForm").addEventListener("submit", async event => {
     try { await updateRecordToCloud(record); status("Procedimiento actualizado", "connected"); } catch (error) { console.error(error); status("No se pudo actualizar", "error"); }
   } else {
     const record = { id: createId(), ...formData };
-    state.records.unshift(record); saveLocal(); render(); event.target.reset(); $("#date").value = new Date().toISOString().slice(0, 10); updatePreview();
+    state.records.unshift(record); saveLocal(); render(); event.target.reset(); $("#date").value = todayLocal(); updatePreview();
     try { await addRecordToCloud(record); } catch (error) { console.error(error); status("No se pudo guardar", "error"); }
   }
 });
