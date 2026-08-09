@@ -138,7 +138,7 @@ function exportRecordsToExcel() {
   const rows = [
     [`${monthLabel.toUpperCase()} PROCEDIMIENTOS`],
     [],
-    ["PROCEDIMIENTOS", "TIPO", "NOTAS", "$", "%", professionalName, "%", doctorName, "Date"]
+    ["PROCEDIMIENTOS", "TIPO", "$", "%", professionalName, "%", doctorName, "Date", "NOTAS"]
   ];
 
   let totalAmount = 0;
@@ -152,34 +152,34 @@ function exportRecordsToExcel() {
     rows.push([
       `${item.patient} - ${item.procedure}`,
       item.type === "general" ? "General" : "Especialista",
-      item.notes || "",
       Number(item.amount.toFixed(2)),
       `${item.percent}%`,
       Number(item.professional.toFixed(2)),
       `${100 - item.percent}%`,
       Number(item.clinic.toFixed(2)),
-      formatShortDate(item.date)
+      formatShortDate(item.date),
+      item.notes || ""
     ]);
   });
 
   rows.push([]);
-  rows.push(["TOTAL", "", "", Number(totalAmount.toFixed(2)), "", Number(totalProfessional.toFixed(2)), "", Number(totalClinic.toFixed(2)), ""]);
+  rows.push(["TOTAL", "", Number(totalAmount.toFixed(2)), "", Number(totalProfessional.toFixed(2)), "", Number(totalClinic.toFixed(2)), "", ""]);
 
   const workbook = XLSXLib.utils.book_new();
   const worksheet = XLSXLib.utils.aoa_to_sheet(rows);
   worksheet["!cols"] = [
     { wch: 38 },
     { wch: 14 },
-    { wch: 25 },
     { wch: 12 },
     { wch: 7 },
     { wch: 16 },
     { wch: 7 },
     { wch: 16 },
-    { wch: 12 }
+    { wch: 12 },
+    { wch: 25 }
   ];
 
-  const currencyColumns = ["D", "F", "H"];
+  const currencyColumns = ["C", "E", "G"];
   for (let r = 4; r <= state.records.length + 4; r += 1) {
     currencyColumns.forEach(col => {
       const cell = worksheet[`${col}${r}`];
